@@ -23,9 +23,7 @@
       --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
 
-    html {
-      height: -webkit-fill-available;
-    }
+    html { height: -webkit-fill-available; }
 
     body {
       min-height: 100vh;
@@ -38,7 +36,6 @@
       text-size-adjust: 100%;
     }
 
-    /* ── Header ── */
     header {
       position: fixed;
       top: 0;
@@ -80,7 +77,6 @@
 
     .about-link:hover { color: var(--ink); }
 
-    /* ── Pages ── */
     .page {
       display: none;
       min-height: 100vh;
@@ -100,10 +96,7 @@
       display: flex;
     }
 
-    /* ── Photo page ── */
-    #page-photo {
-      padding: 76px 40px 48px;
-    }
+    #page-photo { padding: 76px 40px 48px; }
 
     .photo-frame {
       width: 100%;
@@ -123,7 +116,6 @@
       max-height: calc(100vh - 160px);
       -o-object-fit: contain;
       object-fit: contain;
-      /* Fallback for browsers without object-fit */
     }
 
     .photo-meta {
@@ -158,7 +150,6 @@
       line-height: 2.2;
     }
 
-    /* ── About page ── */
     .about-content {
       max-width: 480px;
       width: 100%;
@@ -190,7 +181,6 @@
       display: block;
     }
 
-    /* ── Mobile ── */
     @media screen and (max-width: 600px) {
       header { padding: 20px 24px; }
       #page-photo { padding: 68px 20px 40px; }
@@ -199,11 +189,8 @@
       .photo-frame img { max-height: calc(100vh - 140px); }
     }
 
-    /* ── Notch / safe area ── */
     @supports (padding: env(safe-area-inset-bottom)) {
-      footer, .page {
-        padding-bottom: calc(48px + env(safe-area-inset-bottom));
-      }
+      .page { padding-bottom: calc(48px + env(safe-area-inset-bottom)); }
     }
   </style>
 </head>
@@ -225,15 +212,16 @@
   <div class="page" id="page-about">
     <div class="about-content">
       <h1>Jim in Perth</h1>
-      <p>One photograph. Every day. Perth, Western Australia. Or sometimes somewhere else.</p>
+      <p>One photograph. Every day. At 9am.</p>
       <p>Each image appears for twenty-four hours and is replaced the next morning. There is no archive. What you see today is gone tomorrow.</p>
       <p>Taken on an iPhone. Processed. Posted.</p>
+      <p>Perth, Western Australia. Or sometimes somewhere else.</p>
       <span class="sig">— Jim Smith</span>
     </div>
   </div>
 
   <script>
-    // ── Safe page switching ──
+    // ── Navigation ──
     var pages = {
       photo: document.getElementById('page-photo'),
       about: document.getElementById('page-about')
@@ -242,9 +230,7 @@
     var homeLink  = document.getElementById('homeLink');
 
     function showPage(name) {
-      for (var k in pages) {
-        pages[k].classList.remove('active');
-      }
+      for (var k in pages) { pages[k].classList.remove('active'); }
       pages[name].classList.add('active');
       aboutLink.textContent = (name === 'about') ? '← Back' : 'About';
       window.scrollTo(0, 0);
@@ -260,20 +246,34 @@
       showPage('photo');
     });
 
-    // ── Today's photo ──
+    // ── Filename parsing ──
+    // Expects filenames like: 2026-07-01-kings-park.jpg
+    // Extracts date and converts location slug to readable text
+    function parseFilename(filename) {
+      // Remove extension
+      var base = filename.replace(/\.[^.]+$/, '');
+      // Extract date — first 10 chars YYYY-MM-DD
+      var date = base.slice(0, 10);
+      // Everything after date and hyphen is location slug
+      var locationSlug = base.slice(11) || '';
+      // Convert hyphens to spaces and title case
+      var location = locationSlug
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+      return { date: date, location: location };
+    }
+
     function getToday() {
       var now = new Date();
       var y = now.getFullYear();
-      var m = String(now.getMonth() + 1).padStart('0', 2);
-      var d = String(now.getDate()).padStart('0', 2);
-      // padStart fallback for older browsers
-      if (!String.prototype.padStart) {
-        m = (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1);
-        d = (now.getDate() < 10 ? '0' : '') + now.getDate();
-      }
-      return y + '-' + m + '-' + d;
+      var m = now.getMonth() + 1;
+      var d = now.getDate();
+      return y + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
     }
 
+    // ── Load today's photo from photos.json ──
+    // photos.json is now just a simple array of filenames
+    // e.g. ["2026-06-15-kings-park.jpg", "2026-06-16-st-georges-terrace.jpg"]
     function loadToday() {
       var frame   = document.getElementById('photoFrame');
       var noPhoto = document.getElementById('noPhoto');
@@ -283,29 +283,30 @@
       xhr.open('GET', 'photos.json', true);
       xhr.onreadystatechange = function() {
         if (xhr.readyState !== 4) return;
-        if (xhr.status !== 200) {
-          noPhoto.style.display = 'block';
-          return;
-        }
-        var photos;
-        try { photos = JSON.parse(xhr.responseText); }
+        if (xhr.status !== 200) { noPhoto.style.display = 'block'; return; }
+
+        var files;
+        try { files = JSON.parse(xhr.responseText); }
         catch(e) { noPhoto.style.display = 'block'; return; }
 
-        var entry = null;
-        for (var i = 0; i < photos.length; i++) {
-          if (photos[i].date === today) { entry = photos[i]; break; }
+        // Find today's file
+        var todayFile = null;
+        for (var i = 0; i < files.length; i++) {
+          if (files[i].slice(0, 10) === today) {
+            todayFile = files[i];
+            break;
+          }
         }
 
-        if (!entry) {
-          noPhoto.style.display = 'block';
-          return;
-        }
+        if (!todayFile) { noPhoto.style.display = 'block'; return; }
+
+        var parsed = parseFilename(todayFile);
 
         var img = document.createElement('img');
-        img.src = entry.file;
-        img.alt = entry.location || '';
+        img.src = todayFile;
+        img.alt = parsed.location;
         img.onerror = function() {
-          frame.removeChild(img);
+          if (frame.contains(img)) frame.removeChild(img);
           noPhoto.style.display = 'block';
         };
         frame.appendChild(img);
@@ -315,11 +316,11 @@
 
         var loc = document.createElement('span');
         loc.className = 'photo-location';
-        loc.textContent = entry.location || '';
+        loc.textContent = parsed.location;
 
         var yr = document.createElement('span');
         yr.className = 'photo-year';
-        yr.textContent = entry.date.slice(0, 4);
+        yr.textContent = parsed.date.slice(0, 4);
 
         meta.appendChild(loc);
         meta.appendChild(yr);

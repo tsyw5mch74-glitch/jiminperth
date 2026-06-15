@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Jim in Perth</title>
+  <style>
+    *, *::before, *::after {
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --white: #ffffff;
+      --ink: #1a1a1a;
+      --muted: #aaaaaa;
+      --faint: #e0e0e0;
+      --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    html {
+      height: -webkit-fill-available;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      background: var(--white);
+      font-family: var(--font);
+      color: var(--ink);
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    /* ── Header ── */
+    header {
+      position: fixed;
+      top: 0;
+      top: env(safe-area-inset-top, 0);
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      padding: 24px 40px;
+      background: var(--white);
+    }
+
+    .site-name {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .about-link {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-transition: color 0.2s;
+      transition: color 0.2s;
+      padding: 8px 0 8px 16px;
+    }
+
+    .about-link:hover { color: var(--ink); }
+
+    /* ── Pages ── */
+    .page {
+      display: none;
+      min-height: 100vh;
+      padding: 90px 40px 60px;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+    }
+
+    .page.active {
+      display: -webkit-flex;
+      display: flex;
+    }
+
+    /* ── Photo page ── */
+    #page-photo {
+      padding: 76px 40px 48px;
+    }
+
+    .photo-frame {
+      width: 100%;
+      max-width: 900px;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-align-items: center;
+      align-items: center;
+    }
+
+    .photo-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: calc(100vh - 160px);
+      -o-object-fit: contain;
+      object-fit: contain;
+      /* Fallback for browsers without object-fit */
+    }
+
+    .photo-meta {
+      width: 100%;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      -webkit-align-items: baseline;
+      align-items: baseline;
+      margin-top: 12px;
+    }
+
+    .photo-location {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .photo-year {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--faint);
+    }
+
+    .no-photo {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-align: center;
+      line-height: 2.2;
+    }
+
+    /* ── About page ── */
+    .about-content {
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .about-content h1 {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 40px;
+    }
+
+    .about-content p {
+      font-size: 15px;
+      line-height: 1.85;
+      color: var(--ink);
+      font-weight: 300;
+      margin-bottom: 20px;
+    }
+
+    .about-content .sig {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 48px;
+      display: block;
+    }
+
+    /* ── Mobile ── */
+    @media screen and (max-width: 600px) {
+      header { padding: 20px 24px; }
+      #page-photo { padding: 68px 20px 40px; }
+      .page { padding: 80px 24px 48px; }
+      .about-content p { font-size: 14px; }
+      .photo-frame img { max-height: calc(100vh - 140px); }
+    }
+
+    /* ── Notch / safe area ── */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      footer, .page {
+        padding-bottom: calc(48px + env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="site-name" href="#" id="homeLink">Jim in Perth</a>
+    <a class="about-link" href="#" id="aboutLink">About</a>
+  </header>
+
+  <div class="page active" id="page-photo">
+    <div class="photo-frame" id="photoFrame">
+      <div class="no-photo" id="noPhoto" style="display:none">
+        No photograph today.<br>Come back tomorrow.
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-about">
+    <div class="about-content">
+      <h1>Jim in Perth</h1>
+      <p>One photograph. Every day. Perth, Western Australia. Or sometimes somewhere else.</p>
+      <p>Each image appears for twenty-four hours and is replaced the next morning. There is no archive. What you see today is gone tomorrow.</p>
+      <p>Taken on an iPhone. Processed. Posted.</p>
+      <span class="sig">— Jim Smith</span>
+    </div>
+  </div>
+
+  <script>
+    // ── Safe page switching ──
+    var pages = {
+      photo: document.getElementById('page-photo'),
+      about: document.getElementById('page-about')
+    };
+    var aboutLink = document.getElementById('aboutLink');
+    var homeLink  = document.getElementById('homeLink');
+
+    function showPage(name) {
+      for (var k in pages) {
+        pages[k].classList.remove('active');
+      }
+      pages[name].classList.add('active');
+      aboutLink.textContent = (name === 'about') ? '← Back' : 'About';
+      window.scrollTo(0, 0);
+    }
+
+    aboutLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showPage(pages.about.classList.contains('active') ? 'photo' : 'about');
+    });
+
+    homeLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showPage('photo');
+    });
+
+    // ── Today's photo ──
+    function getToday() {
+      var now = new Date();
+      var y = now.getFullYear();
+      var m = String(now.getMonth() + 1).padStart('0', 2);
+      var d = String(now.getDate()).padStart('0', 2);
+      // padStart fallback for older browsers
+      if (!String.prototype.padStart) {
+        m = (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1);
+        d = (now.getDate() < 10 ? '0' : '') + now.getDate();
+      }
+      return y + '-' + m + '-' + d;
+    }
+
+    function loadToday() {
+      var frame   = document.getElementById('photoFrame');
+      var noPhoto = document.getElementById('noPhoto');
+      var today   = getToday();
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'photos.json', true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return;
+        if (xhr.status !== 200) {
+          noPhoto.style.display = 'block';
+          return;
+        }
+        var photos;
+        try { photos = JSON.parse(xhr.responseText); }
+        catch(e) { noPhoto.style.display = 'block'; return; }
+
+        var entry = null;
+        for (var i = 0; i < photos.length; i++) {
+          if (photos[i].date === today) { entry = photos[i]; break; }
+        }
+
+        if (!entry) {
+          noPhoto.style.display = 'block';
+          return;
+        }
+
+        var img = document.createElement('img');
+        img.src = entry.file;
+        img.alt = entry.location || '';
+        img.onerror = function() {
+          frame.removeChild(img);
+          noPhoto.style.display = 'block';
+        };
+        frame.appendChild(img);
+
+        var meta = document.createElement('div');
+        meta.className = 'photo-meta';
+
+        var loc = document.createElement('span');
+        loc.className = 'photo-location';
+        loc.textContent = entry.location || '';
+
+        var yr = document.createElement('span');
+        yr.className = 'photo-year';
+        yr.textContent = entry.date.slice(0, 4);
+
+        meta.appendChild(loc);
+        meta.appendChild(yr);
+        frame.appendChild(meta);
+      };
+      xhr.send();
+    }
+
+    loadToday();
+  </script>
+
+</body>
+</html>

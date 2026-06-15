@@ -214,7 +214,7 @@
       <h1>Jim in Perth</h1>
       <p>One photograph. Every day. At 9am.</p>
       <p>Each image appears for twenty-four hours and is replaced the next morning. There is no archive. What you see today is gone tomorrow.</p>
-      <p>Taken on an iPhone. Processed. Posted.</p>
+      <p>Taken on iPhone.</p>
       <p>Perth, Western Australia. Or sometimes somewhere else.</p>
       <span class="sig">— Jim Smith</span>
     </div>
@@ -250,17 +250,25 @@
     // Expects filenames like: 2026-07-01-kings-park.jpg
     // Extracts date and converts location slug to readable text
     function parseFilename(filename) {
+      // Expects: 2026-07-01-location-name.png or 2026-07-01-location-name-2008.png
       // Remove extension
       var base = filename.replace(/\.[^.]+$/, '');
-      // Extract date — first 10 chars YYYY-MM-DD
+      // Extract posting date — first 10 chars YYYY-MM-DD
       var date = base.slice(0, 10);
-      // Everything after date and hyphen is location slug
-      var locationSlug = base.slice(11) || '';
-      // Convert hyphens to spaces and title case
-      var location = locationSlug
-        .replace(/-/g, ' ')
+      // Everything after date and hyphen is location + optional original year
+      var rest = base.slice(11) || '';
+      // Check if last segment is a 4-digit year
+      var parts = rest.split('-');
+      var displayYear = date.slice(0, 4);
+      var lastPart = parts[parts.length - 1];
+      if (/^\d{4}$/.test(lastPart)) {
+        displayYear = lastPart;
+        parts = parts.slice(0, -1);
+      }
+      // Convert remaining parts to location
+      var location = parts.join(' ')
         .replace(/\b\w/g, function(c) { return c.toUpperCase(); });
-      return { date: date, location: location };
+      return { date: date, location: location, year: displayYear };
     }
 
     function getToday() {
@@ -320,7 +328,7 @@
 
         var yr = document.createElement('span');
         yr.className = 'photo-year';
-        yr.textContent = parsed.date.slice(0, 4);
+        yr.textContent = parsed.year;
 
         meta.appendChild(loc);
         meta.appendChild(yr);
